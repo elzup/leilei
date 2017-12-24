@@ -63,6 +63,7 @@ let LC_T = "\x54";
 let LC_H = "\x48";
 let LC_COLON = "\x3a";
 let LC_DOT = "\x2e";
+let LC_EMP = "\x20";
 let LC_NUM = [
 	"\x30",
 	"\x31",
@@ -77,12 +78,12 @@ let LC_NUM = [
 ];
 
 function writeLCDTemp(v) {
-	let d = LC_T + LC_COLON + fdataToLC(v);
+	let d = LC_T + LC_COLON + LC_EMP + fdataToLC(v);
 	writeLCD(d, _line1);
 }
 
 function writeLCDHumi(v) {
-	let d = LC_H + LC_COLON + fdataToLC(v);
+	let d = LC_H + LC_COLON + LC_EMP + fdataToLC(v);
 	writeLCD(d, _line2);
 }
 
@@ -91,7 +92,13 @@ function fdataToLC(fv) {
 	let d2 = (fv / 10) % 10;
 	let d1 = fv % 10;
 	let df = (fv * 10) % 10;
-	return LC_NUM[d3] + LC_NUM[d2] + LC_NUM[d1] + LC_DOT + LC_NUM[df];
+	return (
+		(d3 > 0 ? LC_NUM[d3] : LC_EMP) +
+		LC_NUM[d2] +
+		LC_NUM[d1] +
+		LC_DOT +
+		LC_NUM[df]
+	);
 }
 
 // main
