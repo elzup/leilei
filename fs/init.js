@@ -11,7 +11,7 @@ let bus = I2C.get_default();
 
 let _clear = "\x0c";
 let _displayOn = "\x01";
-let _home = "\x02";
+let _line1 = "\x02";
 let _line2 = "\xc0";
 let _data = "\x40";
 
@@ -33,8 +33,6 @@ let get_temps = function() {
 
 	let data = I2C.read(bus, taddr, 6, true);
 
-	print(data);
-
 	let temp = data.at(0) * 256 + data.at(1);
 	let cTemp = -45 + 175 * temp / 65535.0;
 	let fTemp = -49 + 315 * temp / 65535.0;
@@ -43,13 +41,9 @@ let get_temps = function() {
 	return [temp, cTemp, fTemp, humidity];
 };
 
-let writeLCD = function() {
-	// mojilist = [];
-	// for (let i = 0; i < message.length; i++) {
-	// 	// mojilist.push(ord())
-	// }
-	commandReg(_home, daddr);
-	I2C.writeRegN(bus, daddr, 0x40, 2, "\x84\x58");
+let writeLCD = function(d, line) {
+	commandReg(line, daddr);
+	I2C.writeRegN(bus, daddr, 0x40, d.length, d);
 };
 
 let initDisplay = function() {
@@ -65,13 +59,51 @@ let initDisplay = function() {
 	commandReg(_displayOn, daddr);
 };
 
+let LC_T = "\x54";
+let LC_H = "\x48";
+let LC_COLON = "\x3a";
+let LC_DOT = "\x2e";
+let LC_NUM = [
+	"\x30",
+	"\x31",
+	"\x32",
+	"\x33",
+	"\x34",
+	"\x35",
+	"\x36",
+	"\x37",
+	"\x38",
+	"\x39"
+];
+
+function writeLCDTemp(v) {
+	let d = LC_T + LC_COLON + fdataToLC(v);
+	writeLCD(d, _line1);
+}
+
+function writeLCDHumi(v) {
+	let d = LC_H + LC_COLON + fdataToLC(v);
+	writeLCD(d, _line2);
+}
+
+function fdataToLC(fv) {
+	let d3 = (fv / 100) % 10;
+	let d2 = (fv / 10) % 10;
+	let d1 = fv % 10;
+	let df = (fv * 10) % 10;
+	return LC_NUM[d3] + LC_NUM[d2] + LC_NUM[d1] + LC_DOT + LC_NUM[df];
+}
+
+// main
+
 initDisplay();
 Timer.set(
 	1000 * 5,
 	true /* repeat */,
 	function() {
 		let res = get_temps();
-		writeLCD();
+		writeLCDTemp(res[1]);
+		writeLCDHumi(res[3]);
 		print("t:");
 		print(res[1]);
 		print("h:");
