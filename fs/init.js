@@ -22,6 +22,11 @@ let command = function(code, addr) {
 	Sys.usleep(100);
 };
 
+let commandReg = function(code, addr) {
+	I2C.writeRegN(bus, addr, 0x00, code.length, code);
+	Sys.usleep(100);
+};
+
 let get_temps = function() {
 	// Get raw data
 	command(_loadTmp, taddr);
@@ -43,21 +48,21 @@ let writeLCD = function() {
 	// for (let i = 0; i < message.length; i++) {
 	// 	// mojilist.push(ord())
 	// }
-	command(_home, daddr);
+	commandReg(_home, daddr);
 	I2C.writeRegN(bus, daddr, 0x40, 2, "\x84\x58");
 };
 
 let initDisplay = function() {
-	command("\x38", daddr);
-	command("\x39", daddr);
-	command("\x14", daddr);
-	command("\x70", daddr);
-	command("\x56", daddr);
-	command("\x6c", daddr);
-	command("\x38", daddr);
-	command("\x06", daddr);
-	command(_clear, daddr);
-	command(_displayOn, daddr);
+	commandReg("\x38", daddr);
+	commandReg("\x39", daddr);
+	commandReg("\x14", daddr);
+	commandReg("\x70", daddr);
+	commandReg("\x56", daddr);
+	commandReg("\x6c", daddr);
+	commandReg("\x38", daddr);
+	commandReg("\x06", daddr);
+	commandReg(_clear, daddr);
+	commandReg(_displayOn, daddr);
 };
 
 initDisplay();
