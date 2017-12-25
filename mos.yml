@@ -23,7 +23,6 @@ config_schema:
   - ["i2c.enable", true]
   - ["mqtt.server", "mqtt.thingspeak.com"]
   - ["mqtt.enable", true]
-  - ["http.enable", false]
 
 libs:
     # common mgos libs
