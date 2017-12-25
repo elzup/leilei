@@ -115,7 +115,11 @@ Timer.set(
 		print(res[1]);
 		print("h:");
 		print(res[3]);
-		// MQTT.pub('home/livingroom/brightness', JSON.stringify(lux), 0);
+		MQTT.pub(
+			"14fi/env",
+			JSON.stringify({ temperature: res[1], humidity: res[3] }),
+			0
+		);
 	},
 	null
 );
