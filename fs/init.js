@@ -5,6 +5,8 @@ load("api_sys.js");
 load("api_timer.js");
 load("api_i2c.js");
 
+load("secret.js");
+
 let taddr = 0x44;
 let daddr = 0x3e;
 let bus = I2C.get_default();
@@ -16,6 +18,7 @@ let _line2 = "\xc0";
 let _data = "\x40";
 
 let _loadTmp = "\x2C\x06";
+let _softReset = "\x00\x06";
 
 let command = function(code, addr) {
 	I2C.write(bus, addr, code, code.length, true);
@@ -31,7 +34,8 @@ let get_temps = function() {
 	// Get raw data
 	command(_loadTmp, taddr);
 
-	let data = I2C.read(bus, taddr, 6, true);
+	let data = I2C.read(bus, taddr, 6, false);
+	command(_softReset, taddr);
 
 	let temp = data.at(0) * 256 + data.at(1);
 	let cTemp = -45 + 175 * temp / 65535.0;
@@ -105,21 +109,17 @@ function fdataToLC(fv) {
 
 initDisplay();
 Timer.set(
-	1000 * 5,
+	1000 * 60,
 	true /* repeat */,
 	function() {
 		let res = get_temps();
 		writeLCDTemp(res[1]);
 		writeLCDHumi(res[3]);
-		print("t:");
-		print(res[1]);
-		print("h:");
-		print(res[3]);
-		MQTT.pub(
-			"14fi/env",
-			JSON.stringify({ temperature: res[1], humidity: res[3] }),
-			0
-		);
+		let v =
+			"field1=" + JSON.stringify(res[1]) + "&field2=" + JSON.stringify(res[3]);
+		print(v);
+
+		MQTT.pub(secret.mqtt.channel, v, 0);
 	},
 	null
 );
