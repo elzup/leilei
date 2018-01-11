@@ -111,18 +111,16 @@ function tsval(v) {
 	return JSON.stringify(((v * 100) % 1) / 100);
 }
 
-initDisplay();
-Timer.set(
-	1000 * 60,
-	true /* repeat */,
-	function() {
-		let res = get_temps();
-		writeLCDTemp(res[1]);
-		writeLCDHumi(res[3]);
-		let v = "field1=" + tsval(res[1]) + "&field2=" + tsval(res[3]);
-		print(v);
+function runLog() {
+	let res = get_temps();
+	writeLCDTemp(res[1]);
+	writeLCDHumi(res[3]);
+	let v = "field1=" + tsval(res[1]) + "&field2=" + tsval(res[3]);
+	print(v);
 
-		MQTT.pub(secret.mqtt.channel, v, 0);
-	},
-	null
-);
+	MQTT.pub(secret.mqtt.channel, v, 0);
+}
+
+initDisplay();
+runLog();
+Timer.set(1000 * 60, true /* repeat */, runLog, null);
