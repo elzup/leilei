@@ -18,4 +18,12 @@ apps from scratch.
 $ mos build
 $ mos wifi WIFI_SSID WIFI_PASSWORD
 $ mos flush
+$ mos console
 ```
+
+```
+[Jan 12 08:40:59.342] field1=20.623331&field2=21.791409
+[Jan 12 08:40:59.366] MQTT req Success
+```
+
+It Request works!
