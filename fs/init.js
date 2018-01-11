@@ -108,17 +108,20 @@ function fdataToLC(fv) {
 // main
 
 function tsval(v) {
-	return JSON.stringify(((v * 100) % 1) / 100);
+	// return JSON.stringify(v - v % 0.01);
+	return JSON.stringify(v);
 }
 
 function runLog() {
 	let res = get_temps();
 	writeLCDTemp(res[1]);
 	writeLCDHumi(res[3]);
+
 	let v = "field1=" + tsval(res[1]) + "&field2=" + tsval(res[3]);
 	print(v);
 
-	MQTT.pub(secret.mqtt.channel, v, 0);
+	let res = MQTT.pub(secret.mqtt.channel, v, 0);
+	print("MQTT req " + ["Failed", "Success"][res]);
 }
 
 initDisplay();

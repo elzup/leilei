@@ -21,7 +21,7 @@ filesystem:
 
 config_schema:
   - ["i2c.enable", true]
-  - ["mqtt.server", "mqtt.thingspeak.com"]
+  - ["mqtt.server", "mqtt.thingspeak.com:1883"]
   - ["mqtt.enable", true]
 
 libs:
