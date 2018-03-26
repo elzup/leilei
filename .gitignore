@@ -1,2 +1,3 @@
 .envrc
 fs/secret.js
+build/
